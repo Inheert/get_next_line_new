@@ -6,7 +6,7 @@
 /*   By: tclaereb <tclaereb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 18:59:23 by tclaereb          #+#    #+#             */
-/*   Updated: 2023/12/08 19:54:57 by tclaereb         ###   ########.fr       */
+/*   Updated: 2023/12/08 19:56:24 by tclaereb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		new_s[i] = s[i];
 		i++;
 	}
-	printf("1. %s\n", new_s);
 	return (new_s);
 }
 
@@ -127,7 +126,7 @@ char	*get_next_line(int fd)
 	}
 	else
 	{
-		while (ft_strchr(ptr, '\n'))
+		while (!ft_strchr(ptr, '\n'))
 		{
 			i = read_file(fd, ptr);
 			if (i == -1)
@@ -157,6 +156,5 @@ char	*get_next_line(int fd)
 	}
 	free(ptr);
 	ptr = buff;
-	printf("%s\n\n", buff);
 	return (return_ptr);
 }

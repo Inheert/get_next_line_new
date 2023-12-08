@@ -6,7 +6,7 @@
 /*   By: tclaereb <tclaereb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 18:59:23 by tclaereb          #+#    #+#             */
-/*   Updated: 2023/12/08 19:56:24 by tclaereb         ###   ########.fr       */
+/*   Updated: 2023/12/08 22:34:32 by tclaereb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,11 @@ char	*ft_strjoin(char *s1, char const *s2)
 	s = (char *)malloc((ls1 + ls2) * sizeof(char));
 	if (!s)
 		return (NULL);
+	write(1, "\n---", 4);
+	write(1, s1, ls1);
+	write(1, "\n", 1);
+	write(1, s2, ls2);
+	write(1, "---\n", 4);
 	ft_strlcat(s, s1, ls1 + 1);
 	ft_strlcat(s + ls1, s2, ls2 + 1);
 	free(s1);
@@ -87,7 +92,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		return (NULL);
 	new_s = malloc(len * sizeof(char));
 	i = 0;
-	while (i < len)
+	while (i < len && *s)
 	{
 		new_s[i] = s[i];
 		i++;
@@ -95,7 +100,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (new_s);
 }
 
-ssize_t	read_file(int fd, char *ptr)
+ssize_t	read_file(int fd, char **ptr)
 {
 	char	*buff;
 	ssize_t	i;
@@ -106,7 +111,8 @@ ssize_t	read_file(int fd, char *ptr)
 	i = read(fd, buff, BUFFER_SIZE);
 	if (i == -1)
 		return (-1);
-	ft_strjoin(ptr, buff);
+	buff = ft_strjoin(*ptr, buff);
+	*ptr = buff;
 	return (i);
 }
 
@@ -116,27 +122,24 @@ char	*get_next_line(int fd)
 	char		*return_ptr;
 	char		*buff;
 	ssize_t		i;
-
+	
 	if (!ptr)
 	{
 		ptr = malloc(BUFFER_SIZE * sizeof(char));
 		if (!ptr)
 			return (NULL);
-		i = read(fd, ptr, BUFFER_SIZE);		
+		i = read(fd, ptr, BUFFER_SIZE);	
 	}
-	else
+	while (!ft_strchr(ptr, '\n') && i > 0)
 	{
-		while (!ft_strchr(ptr, '\n'))
+		i = read_file(fd, &ptr);
+		if (i == -1)
 		{
-			i = read_file(fd, ptr);
-			if (i == -1)
-			{
-				free(ptr);
-				return (NULL);
-			}
-			else if (i == 0)
-				break ;
+			free(ptr);
+			return (NULL);
 		}
+		else if (i == 0)
+			break ;
 	}
 	i = ft_strchr(ptr, '\n') - ptr;
 	if (!i)
@@ -147,7 +150,7 @@ char	*get_next_line(int fd)
 		free(ptr);
 		return (NULL);
 	}
-	buff = ft_substr(ptr, i + 1, ft_strlen(ptr));
+	buff = ft_substr(ptr + i + 1, 0, ft_strlen(ptr));
 	if (!buff)
 	{
 		free(ptr);
